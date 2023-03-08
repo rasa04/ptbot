@@ -1,34 +1,33 @@
-<?php
+<?php /** @noinspection PhpUnused */
+
 namespace Core\Methods;
 
-use \Core\Consts;
+use Core\Controllers;
+use Exception;
 
 class AnswerInlineQuery
 {
-    use \Core\Controllers;
+    use Controllers;
     
     private array $response;
 
+    /**
+     * @throws Exception
+     */
     public function send(bool $writeLogFile = true, bool $saveDataToJson = true) : void
     {
-        if (empty($this->response['inline_query_id'])) throw new \Exception('inline_query_id does not exists');
-        if (empty($this->response['results'])) throw new \Exception('inline query result does not exists');
+        if (empty($this->response['inline_query_id'])) throw new Exception('inline_query_id does not exists');
+        if (empty($this->response['results'])) throw new Exception('inline query result does not exists');
 
-        $curl = curl_init();
-        curl_setopt_array($curl, [
-            CURLOPT_URL => 'https://api.telegram.org/bot' . Consts::TOKEN . "/answerInlineQuery",
-            CURLOPT_POST => 1,
-            CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_HEADER => 0,
-            CURLOPT_POSTFIELDS => http_build_query($this->response),
-            CURLOPT_SSL_VERIFYPEER => 0,
-        ]);
-        $result = curl_exec($curl);
-        curl_close($curl);
+        $result = $this->client([
+                'verify' => false
+            ])->post('https://api.telegram.org/bot' . $this->token . '/answerInlineQuery', [
+                'form_params' => http_build_query($this->response)
+            ]);
 
         //сохраняем то что бот сам отправляет
-        if($writeLogFile) $this->writeLogFile(json_decode($result, 1), 'message.txt');
-        if($saveDataToJson) $this->saveDataToJson(json_decode($result, 1), 'data.json');
+        if($writeLogFile) $this->writeLogFile(json_decode($result, 1));
+        if($saveDataToJson) $this->saveDataToJson(json_decode($result, 1));
     }
 
     /**
@@ -42,6 +41,7 @@ class AnswerInlineQuery
 
     /**
      * Unique identifier for the target chat or username of the target channel (in the format @channelusername)
+     * @noinspection PhpUnused
      */
     public function results(array | string $results) : object
     {
@@ -61,6 +61,7 @@ class AnswerInlineQuery
     /**
      * Pass True if results may be cached on the server side only for the user that sent the query. 
      * By default, results may be returned to any user who sends the same query
+     * @noinspection PhpUnused
      */
     public function is_personal(bool $is_personal) : object
     {

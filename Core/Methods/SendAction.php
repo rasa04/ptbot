@@ -1,11 +1,14 @@
-<?php
+<?php /** @noinspection PhpUnused */
+
 namespace Core\Methods;
+
+use Core\Controllers;
 
 abstract class SendAction
 {
-    use \Core\Controllers;
+    use Controllers;
 
-    protected $response;
+    protected array $response;
 
     /**
      * Unique identifier for the target chat or username of the target channel (in the format @channelusername)
@@ -63,7 +66,7 @@ abstract class SendAction
     }
 
     /**
-     * Protects the contents of the sent message from forwarding and saving
+     * Protects the contents of the send message from forwarding and saving
      */
     public function protect_content(bool $protect_content) : object
     {

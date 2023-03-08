@@ -1,7 +1,10 @@
-<?php
+<?php /** @noinspection PhpUnused */
+
 namespace Core;
 
+use ArrayIterator;
 use Exception;
+use Triggers\DefaultAct;
 
 class Bootstrap
 {
@@ -26,7 +29,7 @@ class Bootstrap
 
         // GET REQUEST
         $request = $this->getRequest($writeLogFile, $saveDataToJson);
-        
+
         // DETECT PLOT
         $this->detectRequest($request);
     }
@@ -68,6 +71,7 @@ class Bootstrap
 
     /**
      * @throws Exception
+     * @noinspection PhpRedundantOptionalArgumentInspection
      */
     public function getRequest(bool $writeLogFile = true, bool $saveDataToJson = true) : array | null
     {
@@ -88,10 +92,10 @@ class Bootstrap
                     ?? null;
 
         // CREATE ITERATOR FOR ALL REGISTERED RESPONSES
-        if (isset($request['message']['text'])) $iterator = new \ArrayIterator($this->triggers);
-        elseif (isset($request['callback_query']['data'])) $iterator = new \ArrayIterator($this->callbackData);
-        elseif (isset($request['inline_query']['query'])) $iterator = new \ArrayIterator($this->inlineQueries);
-        elseif (isset($request['game_short_name'])) $iterator = new \ArrayIterator($this->games);
+        if (isset($request['message']['text'])) $iterator = new ArrayIterator($this->triggers);
+        elseif (isset($request['callback_query']['data'])) $iterator = new ArrayIterator($this->callbackData);
+        elseif (isset($request['inline_query']['query'])) $iterator = new ArrayIterator($this->inlineQueries);
+        elseif (isset($request['game_short_name'])) $iterator = new ArrayIterator($this->games);
         // else $this->dd($request);
 
         // EXECUTE MATCHED RESPONSE
@@ -102,7 +106,7 @@ class Bootstrap
         }
         
         // DEFAULT HANDLERS
-        if (isset($request['message']['text'])) new \Triggers\DefaultAct($request);
+        if (isset($request['message']['text'])) new DefaultAct($request);
         elseif (isset($request['inline_query']['query'])) new \Interactions\DefaultAct($request);
     }
 }
